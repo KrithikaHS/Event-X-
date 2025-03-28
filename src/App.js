@@ -74,34 +74,36 @@ const handleSubmit = (e) => {
     return;
   }
 
-  const isDuplicateEvent = events.some(
-    (e) => e.name.toLowerCase() === eventData.name.toLowerCase() && e.date === eventData.date
-  );
+ 
 
-  if (isDuplicateEvent) {
-    alert("An event with the same name and date already exists! Choose a different name or date.");
-    return;
-  }
+
 
   let updatedEvents;
+  const isDuplicate = events.some((event, index) =>
+    event.name === eventData.name && event.date === eventData.date && index !== editingIndex
+  );
+
+  if (isDuplicate) {
+    alert("An event with the same name and date already exists!");
+    return;
+  }
   if (editingIndex !== null) {
-    const oldEvent = events[editingIndex];
-    const updatedEvent = { 
-      ...eventData, 
-      image: eventData.image || oldEvent.image 
-    };
+  const updatedEvent = { 
+    ...eventData, 
+    image: eventData.image || events[editingIndex].image 
+  };
 
-    updatedEvents = events.map((event, index) => (index === editingIndex ? updatedEvent : event));
+  updatedEvents = events.map((event, index) => (index === editingIndex ? updatedEvent : event));
 
-    const updatedRegistered = registeredEvents.map((event) =>
-      event.name === oldEvent.name ? updatedEvent : event
-    );
+  const updatedRegistered = registeredEvents.map((event) =>
+    event.name === events[editingIndex].name ? updatedEvent : event
+  );
 
     setRegisteredEvents(updatedRegistered);
     localStorage.setItem("registeredEvents", JSON.stringify(updatedRegistered));
     
     setEditingIndex(null);
-  } else {
+  }  else {
     
     if (!eventData.image) {
       alert("Please upload an image for the event!");
